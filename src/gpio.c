@@ -90,7 +90,7 @@ void gpio_init(void)
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
-#if defined(STM32F4)
+#if defined(STM32F4) || defined(STM32F1)
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 #endif
 
@@ -157,6 +157,28 @@ void gpio_init(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
 	HAL_GPIO_Init(USB_GPIO_Port, &GPIO_InitStruct);
+#endif
+
+#if defined(BOARD_starline_2can)
+    /**USB_OTG_FS GPIO Configuration
+    PA9     ------> USB_OTG_FS_VBUS
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; // def
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
+
+#ifdef TJA1048T_STBN1_Pin
+        /*Configure GPIO pin Output Level */
+        HAL_GPIO_WritePin(TJA1048T_STBN1_GPIO_Port, TJA1048T_STBN1_Pin, GPIO_PIN_SET);
+
+        /*Configure GPIO pins : TJA1048T_STBN2_Pin TJA1048T_STBN1_Pin */
+        GPIO_InitStruct.Pin = TJA1048T_STBN1_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(TJA1048T_STBN1_GPIO_Port, &GPIO_InitStruct);
 #endif
 
 	gpio_init_term();

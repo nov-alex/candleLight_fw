@@ -33,6 +33,7 @@ THE SOFTWARE.
 #define SYSMEM_STM32F042			   0x1FFFC400
 #define SYSMEM_STM32F072			   0x1FFFC800
 #define SYSMEM_STM32G0B1			   0x1FFF0000
+#define SYSMEM_STM32F105               0x1FFFB000 //System memory RM0008 p56 Table 7
 
 static uint32_t dfu_reset_to_bootloader_magic;
 
@@ -64,6 +65,9 @@ void __initialize_hardware_early(void)
 			case 0x467:
 				dfu_jump_to_bootloader(SYSMEM_STM32G0B1);
 				break;
+            case 0x418: // STM32F1 For connectivity devices, the device ID is 0x418
+                dfu_jump_to_bootloader(SYSMEM_STM32F105);
+                break;
 		}
 	}
 
@@ -72,6 +76,7 @@ void __initialize_hardware_early(void)
 
 static void dfu_hack_boot_pin_f042(void)
 {
+#if defined(__HAL_RCC_GPIOF_CLK_ENABLE)
 	__HAL_RCC_GPIOF_CLK_ENABLE();
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.Pin = GPIO_PIN_11;
@@ -80,6 +85,7 @@ static void dfu_hack_boot_pin_f042(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 	HAL_GPIO_WritePin(GPIOF, GPIO_PIN_11, 1);
+#endif
 }
 
 static void dfu_jump_to_bootloader(uint32_t sysmem_base)

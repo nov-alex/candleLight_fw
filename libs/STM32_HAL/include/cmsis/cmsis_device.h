@@ -13,3 +13,7 @@
 #ifdef STM32G0B1xx
 #include <cmsis/device/stm32g0b1xx.h>
 #endif
+
+#ifdef STM32F105xC
+#include <cmsis/device/stm32f105xc.h>
+#endif

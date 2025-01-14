@@ -142,6 +142,11 @@ void HAL_MspInit(void)
 #elif defined(STM32G0)
 	__HAL_RCC_PWR_CLK_ENABLE();
 	HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
+#elif defined(STM32F1)
+    __HAL_RCC_PWR_CLK_ENABLE();
+    __HAL_RCC_AFIO_CLK_ENABLE();
+    /** NOJTAG: JTAG-DP Disabled and SW-DP Enabled */
+    __HAL_AFIO_REMAP_SWJ_NOJTAG();
 #endif
 	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }

@@ -108,6 +108,14 @@ typedef struct {
 #elif defined(STM32G0)
 # define USB_INTERFACE	  USB_DRD_FS
 # define USB_INTERRUPT	  USB_UCPD1_2_IRQn
+#elif defined(STM32F1)
+# define USB_INTERFACE USB_OTG_FS
+# define USB_INTERRUPT OTG_FS_IRQn
+ 
+// RX FIFO is defined in words, so divide bytes by 4
+// RX FIFO size chosen according to reference manual RM0008 which suggests
+// using (largest packet size / 4) + 1
+# define USB_RX_FIFO_SIZE ((256U / 4U) + 1U)
 #endif
 
 uint8_t USBD_GS_CAN_Init(USBD_GS_CAN_HandleTypeDef *hcan, USBD_HandleTypeDef *pdev);

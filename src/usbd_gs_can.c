@@ -46,6 +46,11 @@ THE SOFTWARE.
 
 static volatile bool is_usb_suspend_cb = false;
 
+void __weak USBD_GS_CAN_BittimingRemapper(const struct gs_device_bittiming **timing)
+{
+  UNUSED(timing);
+}
+
 /* Configuration Descriptor */
 static const uint8_t USBD_GS_CAN_CfgDesc[USB_CAN_CONFIG_DESC_SIZ] =
 {
@@ -508,6 +513,8 @@ static uint8_t USBD_GS_CAN_EP0_RxReady(USBD_HandleTypeDef *pdev) {
 		case GS_USB_BREQ_BITTIMING: {
 			const struct gs_device_bittiming *timing = (struct gs_device_bittiming *)hcan->ep0_buf;
 
+            USBD_GS_CAN_BittimingRemapper(&timing);
+
 			if (!can_check_bittiming_ok(&CAN_btconst.btc, timing))
 				goto out_fail;
 
@@ -850,7 +857,14 @@ bool USBD_GS_CAN_DfuDetachRequested(USBD_HandleTypeDef *pdev)
 // Handle USB suspend event
 void USBD_GS_CAN_SuspendCallback(USBD_HandleTypeDef  *pdev)
 {
-	// Disable CAN and go off bus on USB suspend
+
+    #if defined(STM32F1)
+      // Cause never exit from suspend state
+      USBD_LL_Resume(pdev);
+      if (true) return;
+    #endif
+ 
+    // Disable CAN and go off bus on USB suspend
 	USBD_GS_CAN_HandleTypeDef *hcan = (USBD_GS_CAN_HandleTypeDef*) pdev->pClassData;
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(hcan->channels); i++) {

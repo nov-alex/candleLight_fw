@@ -27,6 +27,7 @@ add_compile_options(
 set(CPUFLAGS_F0 -mcpu=cortex-m0)
 set(CPUFLAGS_F4 -mcpu=cortex-m4)
 set(CPUFLAGS_G0 -mcpu=cortex-m0)
+set(CPUFLAGS_F1 -mcpu=cortex-m3)
 
 add_link_options(
 	--specs=nano.specs
@@ -204,6 +205,15 @@ populate_ldscript(CPU_FAMILY STM32G0B1xx
 	HEAP_SIZE 1k
 )
 
+populate_ldscript(CPU_FAMILY STM32F105xC
+        FLASH_START 0x8000000
+        FLASH_SIZE 128k
+        RAM_START 0x20000000
+        RAM_SIZE 64K
+        STACK_SIZE 2k
+        HEAP_SIZE 1k
+)
+
 ######### commands for adding each target have a lot in common: make helper func.
 # one helper func per STM32 CPU family
 
@@ -256,12 +266,23 @@ function(add_g0b1_target TGTNAME)
 	target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32G0B1xx STM32_USB_Device_Library_STM32G0B1xx)
 endfunction()
 
+function(add_f105_target TGTNAME)
+        add_target_common(${TGTNAME} STM32F105xC)
+        target_compile_definitions(${TGTNAME}_fw PRIVATE BOARD_${TGTNAME} STM32F1)
+        target_compile_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F1})
+        target_sources(${TGTNAME}_fw PRIVATE "src/can/bxcan.c")
+        target_sources(${TGTNAME}_fw PRIVATE "src/device/device_f1.c")
+        target_link_options(${TGTNAME}_fw BEFORE PRIVATE ${CPUFLAGS_F1})
+        target_link_libraries(${TGTNAME}_fw PRIVATE STM32_HAL_STM32F105xC STM32_USB_Device_Library_STM32F105xC)
+endfunction()
+
 ########## generate list of targets.
 # the "_fw" part is appended automatically
 set(TGTF042_LIST "cantact" "canalyze" "canable" "usb2can" "cannette")
 set(TGTF072_LIST "candleLight" "CANable_MKS" "CONVERTDEVICE_xCAN" "DSD_TECH_SH_C30A" "FYSETC_UCAN")
 set(TGTF407_LIST "STM32F4_DevBoard")
 set(TGTG0B1_LIST "budgetcan" "CONVERTDEVICE_xCANFD")
+set(TGTF105_LIST "starline_2can")
 
 foreach (TGTNAME IN LISTS TGTF042_LIST)
 	option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" ON)
@@ -289,6 +310,13 @@ foreach (TGTNAME IN LISTS TGTG0B1_LIST)
 	if (BUILD_${TGTNAME})
 		add_g0b1_target(${TGTNAME})
 	endif()
+endforeach()
+
+foreach (TGTNAME IN LISTS TGTF105_LIST)
+        option(BUILD_${TGTNAME} "Build firmware for \"${TGTNAME}\" (default=yes)" ON)
+        if (BUILD_${TGTNAME})
+                add_f105_target(${TGTNAME})
+        endif()
 endforeach()
 
 message("*******************")

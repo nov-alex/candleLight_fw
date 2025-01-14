@@ -366,6 +366,33 @@ THE SOFTWARE.
 	#define TERM_Mode				 GPIO_MODE_OUTPUT_PP
 	#define TERM_Active_High		 1
 
+#elif defined(BOARD_starline_2can)
+	#define USBD_PRODUCT_STRING_FS   "USB-CAN adapter by Starline 2CAN"
+	#define USBD_MANUFACTURER_STRING "Starline"
+	#define DFU_INTERFACE_STRING_FS  "STM32F105 firmware upgrade interface"
+
+	#define TIM2_CLOCK_SPEED         36000000U
+
+	#define CAN_INTERFACE            CAN1
+	#define CAN_CLOCK_SPEED          36000000U
+	#define NUM_CAN_CHANNEL          1
+
+	#define TJA1048T_STBN1_Pin       GPIO_PIN_7 /* CAN1  disable standby mode TJA1048T, active high (HIGH = Normal mode) */
+	#define TJA1048T_STBN1_GPIO_Port GPIOB
+//	#define TJA1048T_STBN2_Pin       GPIO_PIN_4 /* CAN2 disable standby mode TJA1048T, active high (HIGH = Normal mode) */
+//	#define TJA1048T_STBN2_GPIO_Port GPIOB
+
+	// LED pull to Vcc via 1k
+	#define LEDRX_GPIO_Port          GPIOB
+	#define LEDRX_Pin                GPIO_PIN_15
+	#define LEDRX_Mode               GPIO_MODE_OUTPUT_OD
+	#define LEDRX_Active_High        0
+
+	#define LEDTX_GPIO_Port          GPIOC
+	#define LEDTX_Pin                GPIO_PIN_7
+	#define LEDTX_Mode               GPIO_MODE_OUTPUT_OD
+	#define LEDTX_Active_High        0
+
 #else
 	#error please define BOARD
 #endif

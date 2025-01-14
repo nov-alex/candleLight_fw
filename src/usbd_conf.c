@@ -151,6 +151,10 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
 	hpcd_USB_FS.Init.vbus_sensing_enable = DISABLE;
 	hpcd_USB_FS.Init.bulk_doublebuffer_enable = ENABLE;
 	hpcd_USB_FS.Init.iso_singlebuffer_enable = DISABLE;
+#elif defined(STM32F1)
+  hpcd_USB_FS.Init.Sof_enable = DISABLE;
+  hpcd_USB_FS.Init.low_power_enable = DISABLE;
+  hpcd_USB_FS.Init.vbus_sensing_enable = ENABLE;
 #endif
 	HAL_PCD_Init(&hpcd_USB_FS);
 	/*
